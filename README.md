@@ -1,34 +1,112 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Sync Song For Mahsa Amini
 
-## Getting Started
 
-First, run the development server:
+## What is this repo?
+This project has been started to let people sing iranian freedom songs together synchronously. this website is an offline PWA. and syncs with date and time
 
-```bash
-npm run dev
-# or
-yarn dev
+## Table of contents
+
+- [Sync Song For Mahsa Amini](#sync-song-for-mahsa-amini)
+  - [What is this repo?](#what-is-this-repo)
+  - [Table of contents](#table-of-contents)
+  - [Usage](#usage)
+  - [Supported songs and lyrics languages](#supported-songs-and-lyrics-languages)
+  - [Contributing](#contributing)
+    - [How to contribute](#how-to-contribute)
+      - [For Non-developers:](#for-non-developers)
+      - [For developers:](#for-developers)
+      - [What about lyrics](#what-about-lyrics)
+        - [format of info.json](#format-of-infojson)
+        - [format of [locale].lyrics.json](#format-of-localelyricsjson)
+    - [Git-side Steps](#git-side-steps)
+  - [Built With](#built-with)
+
+## Usage
+1. (optional, recommended for better experience) install a chromium-based browser. like Brave (recommended), chrome or Microsoft Edge
+2. open the website.
+3. wait until a successful message shows up at the right bottom corner.
+4. Now you can use this website offline. just open it without any internet at any time.
+5. (optional) you can also install the website as pwa on your device from your browser (there must be an install button). if you cannot find the install button you can google `how to install pwa app in <browser-name>`
+
+## Supported songs and lyrics languages
+feel free to contribute and add more lyrics in your language
+
+- Baraye (For) - Shervin
+  - en
+  - fa
+- Soroode zan (Woman's Anthem) - Mehdi Yarrahi
+  - fa
+- Yare Dabestanie man (My Grade-School Friend) - Fereydoon Foroughi
+  - fa
+
+## Contributing
+
+Any pull requests are pleasured to Iran and your families.
+
+### How to contribute
+
+#### For Non-developers:
+- share
+- use
+- make issue of bugs or idea requests
+- translate lyrics
+
+note:
+> adding new song is not easy. songs are date/time dependent. so adding a new one will change the timeline and lose the synchronization. because this is an offline pwa. not everyone will update it everyday.
+
+#### For developers:
+- like always:
+  - open issue
+  - fix bugs
+  - open PR
+  - improve documentation
+  - or just do like [non-developers](#for-non-developers)
+
+#### What about lyrics
+
+there is a folder per song in `./public/songs` (e.g. `./public/songs/baraye-shervin`).
+in each folder you can find files like this:
+```
+- songs
+  |- [song-name]
+     |- music.mp3 (this is the music)
+     |- fa.lyrics.json (lyrics in farsi)
+     |- en.lyrics.json (lyrics in english)
+     |- info.json (info about song)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+##### format of info.json
+```ts
+{
+    "name": string - Name Of Song
+    "singer": string - Name Of Singer
+    "duration": number - Duration of song in millisecond
+}
+```
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+##### format of [locale].lyrics.json
+```ts
+{
+    "delay": number in millisecond - use this to sync the lyrics with song by adding delay (can be negative)
+    "lyrics": {
+        "minute:second:millisecond": string - lyric
+        //example
+        "0:10:000": "For my sister, your sister, our sisters"
+    }
+}
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Git-side Steps
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+1.  Fork it!
+2.  Create your feature branch: `git checkout -b my-new-feature`
+    1.  if you are adding lyrics translation, add its locale name [here](#supported-songs-and-lyrics-languages)
+3.  Add your changes: `git add .`
+4.  Commit your changes: `git commit -am 'Add some feature'`
+5.  Push to the branch: `git push origin my-new-feature`
+6.  Submit a pull request
 
-## Learn More
+Don't forget anonymity :)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Built With
+Built with hopes and love for our angles, Mahsas and Nikas
