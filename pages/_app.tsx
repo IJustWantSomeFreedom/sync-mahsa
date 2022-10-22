@@ -14,7 +14,7 @@ const META = {
   appName: "Sync Song Mahsa Amini",
   description: "An offline sync pwa website playing songs about freedom",
   appUrl: APP_URL,
-  faviconUrl: new URL("favicon.png", APP_URL).href,
+  faviconUrl: `${APP_URL}/favicon.png`,
   twitterUsername: "WeAreMahsaAmini"
 }
 
@@ -66,7 +66,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>{META.appName} | Sing song synchronously</title>
+        <title>{`${META.appName} | Sing song synchronously`}</title>
         <meta name="application-name" content={META.appName} />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />

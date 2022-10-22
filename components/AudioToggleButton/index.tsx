@@ -52,23 +52,25 @@ const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ dirName, musics, 
   const audioRef = useRef<HTMLAudioElement>() as unknown as React.MutableRefObject<HTMLAudioElement>
   const [shouldPopoverOpen, setShouldPopoverOpen] = useState(true)
   const [key, setKey] = useState(1)
+  const playTimeoutRef = useRef<NodeJS.Timeout>()
 
   const getTimeRef = useRef(getTime)
+
+  const balanceAudioTime = () => {
+    audioRef.current.currentTime = getTimeRef.current() / 1000
+  }
 
   useEffect(() => {
     const audio = audioRef.current
 
     if (isPlaying) {
-      audio.currentTime = 0
-      audio.pause();
-      audio.load();
       audio.play();
 
       audio.volume = 1
 
       const interval = setInterval(() => {
         if (Math.abs((audio.currentTime * 1000) - getTimeRef.current()) >= 1000) {
-          audio.currentTime = getTimeRef.current() / 1000
+          balanceAudioTime()
         }
       }, 1000)
 
@@ -84,13 +86,17 @@ const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ dirName, musics, 
     setKey(Math.random())
   }, [dirName])
 
-  const playHandler = () => {
-    audioRef.current.currentTime = getTime() / 1000
-  }
-
   const clickHandler: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     setIsPlaying(prev => !prev)
     setShouldPopoverOpen(false)
+  }
+
+  const playHandler = () => {
+    clearTimeout(playTimeoutRef.current)
+    
+    balanceAudioTime()
+    
+    playTimeoutRef.current = setTimeout(balanceAudioTime, 1000)
   }
 
   return (
