@@ -32,22 +32,33 @@ const Lyrics: React.FC<LyricsProps> = ({ currentLyricKey, lyrics }) => {
             <Space h={(viewport.current?.clientHeight || 0) * .4} />
 
             {
-                useMemo(() => lyrics.map(({ key, lyric }) => {
+                useMemo(() => lyrics.map(({ key, lyric, pronunciation }) => {
                     const isCurrent = currentLyricKey === key
 
                     return (
                         <div
                             key={key}
-                        ><Text
-                            ref={isCurrent ? currentLyricRef as any : undefined}
-                            weight={isCurrent ? "bold" : "normal"}
-                            color={isCurrent ? (theme.colorScheme === "light" ? "dark" : "light") : "dimmed"}
-                            sx={{ transition: ".3s", }}
-                            size={isCurrent ? "lg" : "md"}
-                            dir="auto"
                         >
+                            {<Text
+                                ref={isCurrent ? currentLyricRef as any : undefined}
+                                weight={isCurrent ? "bold" : "normal"}
+                                color={isCurrent ? (theme.colorScheme === "light" ? "dark" : "light") : "dimmed"}
+                                sx={{ transition: ".3s", }}
+                                size={isCurrent ? "lg" : "md"}
+                                dir="auto"
+                            >
                                 {lyric}
-                            </Text>
+                            </Text>}
+                            {<Text
+                                ref={isCurrent ? currentLyricRef as any : undefined}
+                                weight={isCurrent ? "bold" : "normal"}
+                                color={isCurrent ? (theme.colorScheme === "light" ? "dark" : "light") : "dimmed"}
+                                sx={{ transition: ".3s", opacity: .5 }}
+                                size={isCurrent ? "sm" : "xs"}
+                                dir="auto"
+                            >
+                                {pronunciation}
+                            </Text>}
 
                             <Space h="xs" />
                         </div>

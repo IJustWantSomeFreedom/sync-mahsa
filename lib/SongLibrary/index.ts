@@ -2,6 +2,11 @@ import path from "path"
 import fs from "fs"
 import { SONGS_PATH } from "../env";
 
+type JSONLyrics = Record<string, string | {
+    pronunciation: string;
+    lyric: string;
+}>
+
 export type SongInfo = {
     name: string;
     singer: string;
@@ -12,6 +17,7 @@ export type SongLyric = {
     key: string;
     startTime: number;
     lyric: string;
+    pronunciation: string;
 }
 
 export type SongLyrics = {
@@ -67,8 +73,9 @@ export class SongLibrary {
 
                 if (file.endsWith(".lyrics.json")) {
                     const unJsonLyrics = JSON.parse(await readFile())
+                    const parsedLyrics = this.parseLyrics(unJsonLyrics.lyrics as JSONLyrics)
 
-                    unJsonLyrics.lyrics = this.parseLyrics(unJsonLyrics.lyrics)
+                    unJsonLyrics.lyrics = parsedLyrics
 
                     lyrics[file.split(".")[0]] = unJsonLyrics
                     return
@@ -99,12 +106,33 @@ export class SongLibrary {
         }
     }
 
-    private parseLyrics(lyrics: Record<string, string>) {
-        return Object.entries(lyrics).map(([key, value]) => {
+    private parseLyrics(lyrics: JSONLyrics) {
+        return Object.entries(lyrics).map<SongLyric>(([key, value]) => {
             const [m, s, ms] = key.split(":").map(n => +n)
 
+            let lyric: JSONLyrics[keyof JSONLyrics] = value
+
+            if (typeof value === "string") {
+                if (!value) throw new Error("Lyric value cannot be empty")
+
+                lyric = {
+                    lyric: value,
+                    pronunciation: ""
+                }
+            } else {
+                const { lyric: _lyric, pronunciation } = value
+
+                if (!_lyric) throw new Error("Lyric value cannot be empty")
+
+                lyric = {
+                    lyric: _lyric,
+                    pronunciation: pronunciation || ""
+                }
+            }
+
             return {
-                lyric: value,
+                lyric: typeof lyric === "string" ? lyric : lyric.lyric,
+                pronunciation: typeof lyric === "string" ? "" : lyric.pronunciation,
                 key,
                 startTime: (m * 60_000) + (s * 1000) + ms
             }
