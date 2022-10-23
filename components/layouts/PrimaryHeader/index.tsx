@@ -8,7 +8,8 @@ import {
   useMantineColorScheme,
   Text,
 } from '@mantine/core';
-import { IconBrandGithub, IconSun, IconMoonStars } from '@tabler/icons';
+import { IconBrandGithub, IconShare, IconSun, IconMoonStars, IconHome } from '@tabler/icons';
+import Link from 'next/link';
 import { APP_VERSION, GITHUB_REPOSITORY } from '../../../lib/env';
 
 
@@ -46,7 +47,13 @@ const PrimaryHeader: React.FC = () => {
             offLabel={<IconMoonStars size={16} stroke={2.5} color={theme.colors.blue[6]} />}
             onChange={() => toggleColorScheme()}
           />
-          <Anchor href={GITHUB_REPOSITORY} component="a" variant='text'><IconBrandGithub size={30} /></Anchor>
+          <Anchor sx={{ display: "flex" }} href={GITHUB_REPOSITORY} component="a" variant='text'><IconBrandGithub size={30} /></Anchor>
+          <Link href="/share">
+            <Anchor sx={{ display: "flex" }} component="a" variant='text'><IconShare size={30} /></Anchor>
+          </Link>
+          <Link href="/">
+            <Anchor sx={{ display: "flex" }} component="a" variant='text'><IconHome size={30} /></Anchor>
+          </Link>
         </Group>
       </Container>
     </Header>

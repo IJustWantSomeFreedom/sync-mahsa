@@ -1,5 +1,5 @@
 import { Container, SegmentedControl, Stack, Text, Title } from '@mantine/core'
-import { setNavigationProgress } from '@mantine/nprogress'
+import { resetNavigationProgress, setNavigationProgress } from '@mantine/nprogress'
 import type { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import AudioToggleButton from '../components/AudioToggleButton'
@@ -46,16 +46,27 @@ const Home: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = (props) =
   }, [currentLyrics.delay, currentLyrics.lyrics])
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const lyricsInterval = setInterval(() => {
       const currentTime = client.getCurrentSongTime()
-      setNavigationProgress(currentTime * 100 / info.duration)
       currentSongHandler(currentTime)
     }, 5)
 
+    const progressBarInterval = setInterval(() => {
+      const currentTime = client.getCurrentSongTime()
+      setNavigationProgress(currentTime * 100 / info.duration)
+    }, 50)
+
     return () => {
-      clearInterval(interval)
+      clearInterval(lyricsInterval)
+      clearInterval(progressBarInterval)
     }
   }, [client, currentLyrics.delay, currentLyrics.lyrics, currentSongHandler, info.duration])
+
+  useEffect(() => {
+    return () => {
+      resetNavigationProgress()
+    }
+  }, [])
 
   return (
     <Container>
