@@ -1,4 +1,4 @@
-import { Container, Space, Stack, Text } from '@mantine/core';
+import { Container, Space, Stack, Text, useMantineTheme } from '@mantine/core';
 import React from 'react'
 import QRCode from "qrcode"
 import { APP_URL } from '../lib/env';
@@ -14,18 +14,29 @@ QRCode.toString(APP_URL, { type: "svg" }, function (err, url) {
     qrCode = url
 })
 
+
 const SharePage = () => {
+    const theme = useMantineTheme()
     const { copy } = useClipboard()
 
     return (
-        <Container>
+        <Container mb="lg">
             <Stack
                 align="center"
                 justify="center"
                 spacing="xl"
                 sx={{ textAlign: "center" }}
             >
-                <div style={{ width: "20rem", maxWidth: "100%" }} dangerouslySetInnerHTML={{ __html: qrCode }} />
+                <div
+                    style={{
+                        boxShadow: theme.shadows.lg,
+                        width: "20rem",
+                        maxWidth: "100%",
+                        height: "20rem",
+                        borderRadius: 20, overflow: "hidden"
+                    }}
+                    dangerouslySetInnerHTML={{ __html: qrCode }}
+                />
 
                 <Text>Your friends can open this website easily just by scanning this QRCode</Text>
                 <Text
