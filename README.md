@@ -32,12 +32,14 @@ This project has been started to let people sing iranian freedom songs together 
 feel free to contribute and add more lyrics in your language
 
 - Baraye (For) - Shervin
-  - en
-  - fa
+  - Farsi
+  - Finglish
 - Soroode zan (Woman's Anthem) - Mehdi Yarrahi
-  - fa
+  - Farsi
+  - Finglish
 - Yare Dabestanie man (My Grade-School Friend) - Fereydoon Foroughi
-  - fa
+  - Farsi
+  - Finglish
 
 ## Contributing
 
@@ -70,8 +72,8 @@ in each folder you can find files like this:
 - songs
   |- [song-name]
      |- music.mp3 (this is the music)
-     |- fa.lyrics.json (lyrics in farsi)
-     |- en.lyrics.json (lyrics in english)
+     |- Farsi.lyrics.json (lyrics in Farsi)
+     |- Finglish.lyrics.json (lyrics in Finglish)
      |- info.json (info about song)
 ```
 
