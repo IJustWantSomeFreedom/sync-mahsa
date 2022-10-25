@@ -114,7 +114,7 @@ const PrimaryHeader = () => {
             variant='text'
             weight="bold"
           >#MahsaAmini</Anchor>
-          <Text sx={{ fontFamily: "sans-serif" }} color="blue" size="xs">v{APP_VERSION}</Text>
+          <Text color="blue" size="xs">v{APP_VERSION}</Text>
         </Group>
 
         <Group spacing="xs" className={classes.social} position="right" noWrap>

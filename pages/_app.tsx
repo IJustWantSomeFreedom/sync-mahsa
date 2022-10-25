@@ -2,7 +2,7 @@ import PrimaryHeader from "./../components/layouts/PrimaryHeader"
 import { ColorScheme, ColorSchemeProvider, MantineProvider } from '@mantine/core';
 import type { AppProps } from 'next/app'
 import { useLocalStorage, useColorScheme } from "@mantine/hooks";
-import "../public/fonts/fontiran.css"
+import "../public/fonts/vazirmatn/Vazirmatn-font-face.css"
 import { NavigationProgress } from "@mantine/nprogress";
 import Head from "next/head";
 import { useEffect } from "react"
@@ -103,7 +103,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <MantineProvider
           theme={{
             colorScheme,
-            fontFamily: "iransansdn, Verdana, sans-serif",
+            fontFamily: "Vazirmatn, Verdana, sans-serif",
           }}
           withGlobalStyles
           withNormalizeCSS
