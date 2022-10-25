@@ -11,11 +11,10 @@ import { showNotification, NotificationProps } from "@mantine/notifications";
 import { APP_URL } from "../lib/env";
 
 const META = {
-  appName: "Sync Song Mahsa Amini",
+  appName: "Sync Mahsa",
   description: "An offline sync pwa website playing songs about freedom",
   appUrl: APP_URL,
   faviconUrl: `${APP_URL}/favicon.png`,
-  twitterUsername: "WeAreMahsaAmini"
 }
 
 const showDefaultNotification = (props: NotificationProps) => showNotification({
@@ -90,7 +89,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="twitter:title" content={META.appName} />
         <meta name="twitter:description" content={META.description} />
         <meta name="twitter:image" content={META.faviconUrl} />
-        <meta name="twitter:creator" content={`@${META.twitterUsername}`} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content={META.appName} />
         <meta property="og:description" content={META.description} />

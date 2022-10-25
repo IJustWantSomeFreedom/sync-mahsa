@@ -1,4 +1,4 @@
-# Sync Song For Mahsa Amini
+# Sync Mahsa
 
 
 ## What is this repo?
@@ -6,7 +6,7 @@ This project has been started to let people sing iranian freedom songs together 
 
 ## Table of contents
 
-- [Sync Song For Mahsa Amini](#sync-song-for-mahsa-amini)
+- [Sync Mahsa](#sync-mahsa)
   - [What is this repo?](#what-is-this-repo)
   - [Table of contents](#table-of-contents)
   - [Usage](#usage)

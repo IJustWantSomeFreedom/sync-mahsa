@@ -1,6 +1,6 @@
 {
-    "name": "Sync Song Mahsa Amini",
-    "short_name": "Sync Song Mahsa Amini",
+    "name": "Sync Mahsa",
+    "short_name": "Sync Mahsa",
     "description": "An offline sync pwa website playing songs about freedom",
     "icons": {
         "512": "/favicon.png"
