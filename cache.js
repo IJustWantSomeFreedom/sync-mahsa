@@ -65,7 +65,7 @@ module.exports = [
             cacheName: 'static-audio-assets',
             expiration: {
                 maxEntries: 32,
-                maxAgeSeconds: 24 * 60 * 60 // 24 hours
+                maxAgeSeconds: 24 * 60 * 60 * 30 // 30 days
             }
         }
     },
