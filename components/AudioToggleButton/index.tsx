@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react'
-import { IconArrowNarrowDown, IconChevronDown, IconVolume, IconVolumeOff } from '@tabler/icons';
+import { IconVolume, IconVolumeOff } from '@tabler/icons';
 import { Button, createStyles, keyframes, Popover, Text } from '@mantine/core';
-import { BASE_SONGS_URL } from '../../lib/env';
+import { CDN_URL, SONGS_PATH } from '../../lib/env';
 import mime from "mime/lite"
 
 const bounce = keyframes({
@@ -93,9 +93,9 @@ const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ dirName, musics, 
 
   const playHandler = () => {
     clearTimeout(playTimeoutRef.current)
-    
+
     balanceAudioTime()
-    
+
     playTimeoutRef.current = setTimeout(balanceAudioTime, 1000)
   }
 
@@ -129,7 +129,7 @@ const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ dirName, musics, 
               key={key}
             >
               {useMemo(() => Object.entries(musics).map(([key, value]) => (
-                <source key={key} src={`${BASE_SONGS_URL}/${dirName}/${value}`} type={mime.getType(value)!} />
+                <source key={key} src={[CDN_URL, SONGS_PATH, dirName, value].join("/")} type={mime.getType(value)!} />
               )), [musics, dirName])}
             </audio>
             {isPlaying ? <IconVolume /> : <IconVolumeOff />}
