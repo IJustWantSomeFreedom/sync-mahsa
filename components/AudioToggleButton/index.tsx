@@ -3,6 +3,8 @@ import { IconVolume, IconVolumeOff } from '@tabler/icons';
 import { Button, createStyles, keyframes, Popover, Text } from '@mantine/core';
 import { CDN_URL, SONGS_PATH } from '../../lib/env';
 import mime from "mime/lite"
+import { showNotification } from '@mantine/notifications';
+import { Songs } from '../../lib/SongLibrary';
 
 const bounce = keyframes({
   'from': { transform: 'translate(-50%, 0)' },
@@ -44,14 +46,70 @@ type AudioToggleButtonProps = {
   musics: Record<string, string>;
   dirName: string;
   getTime: () => number;
+  songs: Songs;
 }
 
-const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ dirName, musics, getTime }) => {
+class SongAudio {
+  private audio: HTMLAudioElement;
+  private cleanups: (() => void)[] = [];
+  private syncInterval?: NodeJS.Timer;
+
+  constructor(public name: string, private getTime: () => number) {
+    this.audio = new Audio([CDN_URL, SONGS_PATH, name, "music.mp3"].join("/"))
+  }
+
+  async load() {
+    const listener = () => {
+      Promise.resolve()
+      this.audio.removeEventListener("canplaythrough", listener)
+    }
+
+    this.audio.addEventListener("canplaythrough", listener)
+
+    this.cleanups.push(() => {
+      this.audio.removeEventListener("canplaythrough", listener)
+    })
+
+    this.audio.load()
+  }
+
+  play() {
+    this.audio.play()
+    this.audio.volume = 1
+    this.sync()
+
+    clearInterval(this.syncInterval)
+
+    const interval = this.syncInterval = setInterval(() => {
+      if (Math.abs((this.audio.currentTime * 1000) - this.getTime()) >= 1000) {
+        this.sync()
+      }
+    }, 1000)
+
+    this.cleanups.push(() => {
+      clearInterval(interval)
+      this.pause()
+    })
+  }
+
+  pause() {
+    this.audio.pause()
+  }
+
+  sync() {
+    this.audio.currentTime = this.getTime() / 1000
+  }
+
+  cleanup() {
+    this.cleanups.forEach(cleanupFn => cleanupFn())
+  }
+}
+
+const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ dirName, musics, getTime, songs }) => {
   const { classes } = useStyles()
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement>() as unknown as React.MutableRefObject<HTMLAudioElement>
   const [shouldPopoverOpen, setShouldPopoverOpen] = useState(true)
-  const [key, setKey] = useState(1)
   const playTimeoutRef = useRef<NodeJS.Timeout>()
 
   const getTimeRef = useRef(getTime)
@@ -60,33 +118,40 @@ const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ dirName, musics, 
     audioRef.current.currentTime = getTimeRef.current() / 1000
   }
 
-  useEffect(() => {
-    const audio = audioRef.current
+  // useEffect(() => {
+  //   const audio = audioRef.current
 
-    if (isPlaying) {
-      audio.play();
+  //   if (isPlaying) {
+  //     audio.currentTime = 0
 
-      audio.volume = 1
+  //     audio.pause()
 
-      const interval = setInterval(() => {
-        if (Math.abs((audio.currentTime * 1000) - getTimeRef.current()) >= 1000) {
-          balanceAudioTime()
-        }
-      }, 1000)
+  //     const listener = () => {
+  //       audio.play()
+  //       audio.removeEventListener("canplaythrough", listener)
+  //     }
 
-      return () => {
-        clearInterval(interval)
-      }
-    } else {
-      audio.pause();
-    }
-  }, [isPlaying, key])
+  //     audio.addEventListener("canplaythrough", listener)
+  //     audio.load()
 
-  useEffect(() => {
-    setKey(Math.random())
-  }, [dirName])
+  //     audio.volume = 1
 
-  const clickHandler: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+  //     const interval = setInterval(() => {
+  //       if (Math.abs((audio.currentTime * 1000) - getTimeRef.current()) >= 1000) {
+  //         balanceAudioTime()
+  //       }
+  //     }, 1000)
+
+  //     return () => {
+  //       clearInterval(interval)
+  //       audio.removeEventListener("canplaythrough", listener)
+  //     }
+  //   } else {
+  //     audio.pause();
+  //   }
+  // }, [isPlaying, dirName])
+
+  const clickHandler = () => {
     setIsPlaying(prev => !prev)
     setShouldPopoverOpen(false)
   }
@@ -98,6 +163,30 @@ const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ dirName, musics, 
 
     playTimeoutRef.current = setTimeout(balanceAudioTime, 1000)
   }
+
+  const audiosRef = useRef<SongAudio[]>([])
+
+  useEffect(() => {
+    const audios = audiosRef.current = songs.songs.map(song => new SongAudio(song.name, getTimeRef.current))
+
+    audios.forEach(audio => audio.load())
+
+    return () => {
+      audios.forEach(audio => audio.cleanup())
+    }
+  }, [songs])
+
+  useEffect(() => {
+    const audio = audiosRef.current.find(audio => audio.name === dirName)
+
+    if (!audio) return;
+
+    audiosRef.current.forEach(audio => audio.pause())
+
+    if (isPlaying) {
+      audio.play()
+    }
+  }, [isPlaying, dirName])
 
   return (
     <div className={classes.container}>
@@ -120,18 +209,6 @@ const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ dirName, musics, 
       >
         <Popover.Target>
           <Button variant='subtle' onClick={clickHandler}>
-            <audio
-              onPlay={playHandler}
-              ref={audioRef}
-              controlsList="nodownload"
-              controls
-              hidden
-              key={key}
-            >
-              {useMemo(() => Object.entries(musics).map(([key, value]) => (
-                <source key={key} src={[CDN_URL, SONGS_PATH, dirName, value].join("/")} type={mime.getType(value)!} />
-              )), [musics, dirName])}
-            </audio>
             {isPlaying ? <IconVolume /> : <IconVolumeOff />}
           </Button>
         </Popover.Target>

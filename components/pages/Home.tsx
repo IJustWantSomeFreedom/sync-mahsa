@@ -91,6 +91,7 @@ const Home: React.FC<{ songs: Songs }> = (props) => {
           dirName={name}
           musics={musics}
           getTime={() => client.getCurrentSongTime()}
+          songs={props.songs}
         />
       </Container >
     )
