@@ -19,7 +19,7 @@ const getSongsUrl = () => {
 const withPWA = require('next-pwa')({
   dest: 'public',
   runtimeCaching,
-  publicExcludes: ["songs/*/music.mp3"],
+  publicExcludes: ["songs/*/music.mp3", "icons", "fonts"],
   additionalManifestEntries: [...getSongsUrl()]
 })
 
