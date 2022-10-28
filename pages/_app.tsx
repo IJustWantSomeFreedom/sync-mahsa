@@ -139,8 +139,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           withGlobalStyles
           withNormalizeCSS
         >
-          <NotificationsProvider>
-
+          <NotificationsProvider position="top-center">
             <NavigationProgress />
             <PrimaryHeader />
             <Component {...pageProps} />
