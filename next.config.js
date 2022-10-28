@@ -32,9 +32,11 @@ const nextConfig = withBundleAnalyzer(withPWA({
   reactStrictMode: true,
   swcMinify: true,
   env: {
-    BASE_SONGS_URL: process.env.BASE_SONGS_URL,
     APP_VERSION: process.env.APP_VERSION,
     CDN_URL: process.env.CDN_URL,
+    APP_URL: process.env.APP_URL,
+    GITHUB_REPOSITORY: process.env.GITHUB_REPOSITORY,
+    SONGS_PATH: process.env.SONGS_PATH,
   },
   async headers() {
     const headers = []
