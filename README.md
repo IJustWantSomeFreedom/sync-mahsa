@@ -66,7 +66,7 @@ note:
 
 #### What about lyrics
 
-there is a folder per song in `./public/songs` (e.g. `./public/songs/baraye-shervin`).
+there is a folder per song in `/songs` (e.g. `/songs/baraye-shervin`).
 in each folder you can find files like this:
 ```
 - songs
