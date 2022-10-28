@@ -5,17 +5,9 @@ import { APP_URL } from '../lib/env';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import MediaWrapper from '../components/MediaWrapper';
+import { InferGetStaticPropsType, NextPage } from 'next';
 
-let qrCode: string;
-
-QRCode.toString(APP_URL, { type: "svg" }, function (err, url) {
-    if (err) throw err
-
-    qrCode = url
-})
-
-
-const SharePage = () => {
+const SharePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({ qrCodeSvg }) => {
     const theme = useMantineTheme()
     const { copy } = useClipboard()
 
@@ -35,7 +27,7 @@ const SharePage = () => {
                         height: "20rem",
                         borderRadius: 20, overflow: "hidden"
                     }}
-                    dangerouslySetInnerHTML={{ __html: qrCode }}
+                    dangerouslySetInnerHTML={{ __html: qrCodeSvg }}
                 />
 
                 <Text>Your friends can open this website easily just by scanning this QRCode</Text>
@@ -60,6 +52,22 @@ const SharePage = () => {
             </Stack>
         </Container>
     )
+}
+
+export const getStaticProps = () => {
+    let qrCode: string = "";
+
+    QRCode.toString(APP_URL, { type: "svg" }, function (err, url) {
+        if (err) throw err
+
+        qrCode = url
+    })
+
+    return {
+        props: {
+            qrCodeSvg: qrCode
+        }
+    }
 }
 
 export default SharePage
