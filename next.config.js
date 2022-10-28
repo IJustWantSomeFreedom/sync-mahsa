@@ -25,12 +25,25 @@ const withPWA = require('next-pwa')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withPWA({
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
   env: {
     BASE_SONGS_URL: process.env.BASE_SONGS_URL,
     APP_VERSION: process.env.APP_VERSION,
     CDN_URL: process.env.CDN_URL,
+  },
+  async headers() {
+    return [
+      {
+        source: "/(.*?)",
+        headers: [
+          {
+            key: 'Bypass-Tunnel-Reminder',
+            value: '1',
+          },
+        ],
+      },
+    ]
   },
 })
 

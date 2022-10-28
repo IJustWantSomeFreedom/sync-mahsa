@@ -1,6 +1,6 @@
 import type { GetStaticProps, InferGetStaticPropsType, NextPage } from 'next'
 import { SongLibrary, Songs } from '../lib/SongLibrary'
-import React, { Suspense } from "react"
+import React from "react"
 import dynamic from 'next/dynamic'
 
 const Home = dynamic(() => import('../components/pages/Home'), {
