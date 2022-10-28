@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "export": "next build && next export",
-    "generate-icons": "pwa-asset-generator ./public/favicon.png ./public/icons/ --path ./public --manifest ./public/manifest.json"
+    "generate-icons": "pwa-asset-generator ./public/favicon.png ./public/icons/ --path ./public --manifest ./public/manifest.json",
+    "analyze": "cross-env ANALYZE=true next build"
   },
   "repository": "https://github.com/WeAreMahsaAmini",
   "dependencies": {
@@ -31,6 +32,7 @@
     "react-share": "^4.4.1"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^13.0.0",
     "@types/howler": "^2.2.7",
     "@types/mime": "^3.0.1",
     "@types/node": "18.8.3",
@@ -38,6 +40,7 @@
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
     "@types/workbox-window": "^4.3.4",
+    "cross-env": "^7.0.3",
     "eslint": "8.25.0",
     "eslint-config-next": "12.3.1",
     "pwa-asset-generator": "^6.2.0",

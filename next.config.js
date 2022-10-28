@@ -19,13 +19,17 @@ const getSongsUrl = () => {
 const withPWA = require('next-pwa')({
   dest: 'public',
   runtimeCaching,
-  publicExcludes: ["songs/*/music.mp3", "icons", "fonts"],
+  publicExcludes: ["icons", "fonts"],
   additionalManifestEntries: [...getSongsUrl()]
 })
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 /** @type {import('next').NextConfig} */
-const nextConfig = withPWA({
-  reactStrictMode: false,
+const nextConfig = withBundleAnalyzer(withPWA({
+  reactStrictMode: true,
   swcMinify: true,
   env: {
     BASE_SONGS_URL: process.env.BASE_SONGS_URL,
@@ -33,8 +37,10 @@ const nextConfig = withPWA({
     CDN_URL: process.env.CDN_URL,
   },
   async headers() {
-    return [
-      {
+    const headers = []
+
+    if (process.env.NODE_ENV === "development") {
+      headers.push({
         source: "/(.*?)",
         headers: [
           {
@@ -42,9 +48,11 @@ const nextConfig = withPWA({
             value: '1',
           },
         ],
-      },
-    ]
+      })
+    }
+
+    return headers
   },
-})
+}))
 
 module.exports = nextConfig
