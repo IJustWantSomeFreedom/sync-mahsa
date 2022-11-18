@@ -1,4 +1,4 @@
-import { SongDetails, Songs } from "../SongLibrary";
+import { SongFullDetails } from "../SongParser/types";
 import { Timer } from "../Time";
 
 type EventsMap = {
@@ -9,7 +9,7 @@ export class SongsClient {
     private events: { [key in keyof EventsMap]?: EventsMap[key][] } = {}
     private interval: NodeJS.Timer | null = null;
 
-    constructor(private songs: Songs) { }
+    constructor(private songs: SongFullDetails[]) { }
 
     listen() {
         let prev = this.getCurrentSong()
@@ -25,15 +25,19 @@ export class SongsClient {
         }, 5)
     }
 
+    getWholeTimeInMS() {
+        return this.songs.reduce((a, b) => a + b.info.duration, 0)
+    }
+
     cleanup() {
         if (this.interval) clearInterval(this.interval)
     }
 
     getCurrentSong() {
-        let offset = Timer.now().valueOf() % this.songs.wholeTimeInMS
+        let offset = Timer.now().valueOf() % this.getWholeTimeInMS()
 
-        for (let i = 0; i < this.songs.songs.length; i++) {
-            const song = this.songs.songs[i]
+        for (let i = 0; i < this.songs.length; i++) {
+            const song = this.songs[i]
 
             if (offset < song.info.duration) {
                 return song
@@ -42,14 +46,14 @@ export class SongsClient {
             offset -= song.info.duration
         }
 
-        return this.songs.songs[0]
+        return this.songs[0]
     }
 
     getCurrentSongTime() {
-        let offset = Timer.now().valueOf() % this.songs.wholeTimeInMS
+        let offset = Timer.now().valueOf() % this.getWholeTimeInMS()
 
-        for (let i = 0; i < this.songs.songs.length; i++) {
-            const song = this.songs.songs[i]
+        for (let i = 0; i < this.songs.length; i++) {
+            const song = this.songs[i]
 
             if (offset < song.info.duration) {
                 break
@@ -64,9 +68,40 @@ export class SongsClient {
     getNextSong() {
         const currentSong = this.getCurrentSong()
 
-        const index = this.songs.songs.indexOf(currentSong)
+        const index = this.songs.indexOf(currentSong)
 
-        return this.songs.songs[index >= this.songs.songs.length ? 0 : index + 1]
+        return this.songs[index >= this.songs.length ? 0 : index + 1]
+    }
+
+    getCurrentLyric(lyricsName: string) {
+        const { lyrics } = this.getCurrentSong()
+        const currentTime = this.getCurrentSongTime()
+        const currentLyrics = lyrics.find(lyrics => lyrics.name = lyricsName) || lyrics[0]
+
+        const currentTimeInMS = currentTime - currentLyrics.delay
+
+        for (let i = 0; i < currentLyrics.lyrics.length; i++) {
+
+            const current = currentLyrics.lyrics[i]
+            const prev = currentLyrics.lyrics[i - 1]
+
+            if (currentTimeInMS < current.startTime) {
+                if (prev) {
+                    return prev
+                }
+
+                return current
+            } else if (currentTimeInMS === current.startTime) {
+                return current
+            }
+
+            // last item
+            if (i === currentLyrics.lyrics.length - 1 && currentTimeInMS >= current.startTime) {
+                return current
+            }
+        }
+
+        return currentLyrics.lyrics[0]
     }
 
     on<TEvent extends keyof EventsMap>(event: TEvent, callback: EventsMap[TEvent]) {

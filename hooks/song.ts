@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
 import { SongsClient } from "../lib/ClientSong"
-import { SongDetails, Songs } from "../lib/SongLibrary"
+import { SongFullDetails } from "../lib/SongParser/types"
 
-export const useSong = (songDetails: Songs) => {
+export const useSong = (songDetails: SongFullDetails[]) => {
     const [client] = useState(() => new SongsClient(songDetails))
-    const [currentSong, setCurrentSong] = useState<SongDetails>(client.getCurrentSong())
+    const [currentSong, setCurrentSong] = useState<SongFullDetails>(client.getCurrentSong())
 
     useEffect(() => {
         client.listen()

@@ -129,11 +129,11 @@ const PrimaryHeader = () => {
           </Anchor>
 
           <Link href={router.pathname === "/" ? "/share" : "/"}>
-            <Anchor component="a" variant='text'>
+            <Text variant='text'>
               <ActionIcon size="lg">
                 {router.pathname === "/" ? <IconQrcode size={20} stroke={1.5} /> : <IconHome size={20} stroke={1.5} />}
               </ActionIcon>
-            </Anchor>
+            </Text>
           </Link>
         </Group>
       </Container>

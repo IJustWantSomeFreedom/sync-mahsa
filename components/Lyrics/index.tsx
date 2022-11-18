@@ -1,7 +1,19 @@
-import { ScrollArea, Space, Text, useMantineTheme } from '@mantine/core'
+import { createStyles, ScrollArea, Space, Text } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks';
 import React, { useEffect, useMemo, useRef } from 'react'
-import { SongLyric } from '../../lib/SongLibrary'
+import { SongLyric } from '../../lib/SongParser/types';
+
+type StylesOptions = {
+    viewportHeight: number;
+}
+
+const useStyles = createStyles((theme, { viewportHeight }: StylesOptions) => ({
+    scrollAreaRoot: {
+        width: typeof window !== "undefined" && document.body.scrollHeight <= viewportHeight && viewportHeight !== 0 ? "100%" : "max-content",
+        textAlign: "center",
+        height: "auto"
+    }
+}))
 
 type LyricsProps = {
     currentLyricKey: string | undefined;
@@ -9,10 +21,10 @@ type LyricsProps = {
 }
 
 const Lyrics: React.FC<LyricsProps> = ({ currentLyricKey, lyrics }) => {
-    const theme = useMantineTheme()
-    const currentLyricRef = useRef<HTMLDivElement>()
-    const viewport = useRef<HTMLDivElement>();
     const { height } = useViewportSize()
+    const { classes, theme } = useStyles({ viewportHeight: height })
+    const currentLyricRef = useRef<HTMLDivElement>(null)
+    const viewport = useRef<HTMLDivElement>();
 
     useEffect(() => {
         viewport.current?.scrollTo({ top: (currentLyricRef.current?.offsetTop || 0) - (viewport.current.clientHeight / 2), behavior: "smooth" })
@@ -22,11 +34,7 @@ const Lyrics: React.FC<LyricsProps> = ({ currentLyricKey, lyrics }) => {
         <ScrollArea
             viewportRef={viewport as any}
             scrollbarSize={0}
-            sx={{
-                width: typeof window !== "undefined" && document.body.scrollHeight <= height && height !== 0 ? "100%" : "max-content",
-                textAlign: "center",
-                height: "auto"
-            }}
+            classNames={{ root: classes.scrollAreaRoot }}
             offsetScrollbars
         >
             <Space h={(viewport.current?.clientHeight || 0) * .4} />
@@ -36,11 +44,9 @@ const Lyrics: React.FC<LyricsProps> = ({ currentLyricKey, lyrics }) => {
                     const isCurrent = currentLyricKey === key
 
                     return (
-                        <div
-                            key={key}
-                        >
+                        <div key={key}>
                             {<Text
-                                ref={isCurrent ? currentLyricRef as any : undefined}
+                                ref={isCurrent ? currentLyricRef : undefined}
                                 weight={isCurrent ? "bold" : "normal"}
                                 color={isCurrent ? (theme.colorScheme === "light" ? "dark" : "light") : "dimmed"}
                                 sx={{ transition: ".3s", }}
@@ -50,7 +56,6 @@ const Lyrics: React.FC<LyricsProps> = ({ currentLyricKey, lyrics }) => {
                                 {lyric}
                             </Text>}
                             {<Text
-                                ref={isCurrent ? currentLyricRef as any : undefined}
                                 weight={isCurrent ? "bold" : "normal"}
                                 color={isCurrent ? (theme.colorScheme === "light" ? "dark" : "light") : "dimmed"}
                                 sx={{ transition: ".3s", opacity: .5 }}
