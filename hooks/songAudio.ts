@@ -1,64 +1,65 @@
-import { useCallback, useEffect, useRef, useState } from "react"
-import { SongAudio } from "../lib/SongAudio"
-import { SongFullDetails } from "../lib/SongParser/types";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ClientSong } from "../lib/ClientSong";
+import { SongAudio } from "../lib/SongAudio";
 
 export type UseSongAudioOptions = {
-    currentSongName: string;
-    getTime: () => number;
-    songs: SongFullDetails[];
-}
+  client: ClientSong;
+};
 
-export const useSongAudio = ({ currentSongName, getTime, songs }: UseSongAudioOptions) => {
-    const [isPlaying, setIsPlaying] = useState(false)
-    const audiosRef = useRef<SongAudio[]>([])
-    const getTimeRef = useRef(getTime)
+export const useSongAudio = ({ client }: UseSongAudioOptions) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audiosRef = useRef<SongAudio[]>([]);
 
-    const togglePlay = useCallback(() => {
-        setIsPlaying(prev => !prev)
-    }, [])
+  const togglePlay = useCallback(() => {
+    setIsPlaying((prev) => !prev);
+  }, []);
 
-    const play = useCallback(() => {
-        setIsPlaying(true)
-    }, [])
+  const play = useCallback(() => {
+    setIsPlaying(true);
+  }, []);
 
-    const pause = useCallback(() => {
-        setIsPlaying(false)
-    }, [])
+  const pause = useCallback(() => {
+    setIsPlaying(false);
+  }, []);
 
-    useEffect(() => {
-        const audios = audiosRef.current = songs.map(song => new SongAudio(song.name, getTimeRef.current))
+  useEffect(() => {
+    const audios = (audiosRef.current = client.songs.map(
+      (song) => new SongAudio(song.name, () => client.getTime())
+    ));
 
-        return () => {
-            audios.map(audio => audio.pause())
-        }
-    }, [songs])
+    return () => {
+      audios.map((audio) => audio.pause());
+    };
+  }, [client]);
 
-    useEffect(() => {
-        audiosRef.current.forEach(audio => {
-            audio.pause()
-        })
+  useEffect(() => {
+    audiosRef.current.forEach((audio) => {
+      audio.pause();
+    });
 
-        if (isPlaying) {
-            audiosRef.current.forEach(audio => {
-                audio.init()
-            })
+    if (isPlaying) {
+      audiosRef.current.forEach((audio) => {
+        audio.init();
+      });
 
-            const currentAudio = audiosRef.current.find(audio => audio.name === currentSongName)
+      const currentAudio = audiosRef.current.find(
+        (audio) => audio.name === client.getCurrentSong().name
+      );
 
-            if (!currentAudio) return;
+      if (!currentAudio) return;
 
-            const cleanup = currentAudio.play()
+      const cleanup = currentAudio.play();
 
-            return () => {
-                cleanup()
-            }
-        }
-    }, [isPlaying, currentSongName])
-
-    return {
-        togglePlay,
-        play,
-        pause,
-        isPlaying
+      return () => {
+        cleanup();
+      };
     }
-}
+  }, [isPlaying, client]);
+
+  return {
+    togglePlay,
+    play,
+    pause,
+    isPlaying,
+  };
+};

@@ -1,7 +1,7 @@
 import { Container, SegmentedControl, Stack, Text, Title } from '@mantine/core'
 import { useLocalStorage } from '@mantine/hooks'
 import { resetNavigationProgress, setNavigationProgress } from '@mantine/nprogress'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useSong } from '../../hooks/song'
 import { SongFullDetails } from '../../lib/SongParser/types'
 import AudioToggleButton from '../AudioToggleButton'
@@ -13,34 +13,25 @@ const Home: React.FC<{ songs: SongFullDetails[] }> = (props) => {
     defaultValue: "Farsi",
   })
 
-  const { currentSong: { name, info, lyrics }, client } = useSong(props.songs)
-  const [currentLyricKey, setCurrentLyricKey] = useState<string>()
+  const { currentSong: { info, lyrics }, client, audio } = useSong(props.songs)
 
   const sortedLyricsName = useMemo(() => lyrics.map(a => a.name).sort((a, b) => a.toLowerCase() === "farsi" ? -1 : a.localeCompare(b)), [lyrics])
-  const preferredLyricsName = useMemo(() => lyricsName in lyrics ? lyricsName : "Farsi", [lyricsName, lyrics])
-  const currentLyrics = useMemo(() => lyrics.find(item => item.name === preferredLyricsName) || lyrics[0], [preferredLyricsName, lyrics])
-
-  const currentLyricHandler = useCallback(() => {
-    const currentLyric = client.getCurrentLyric(currentLyrics.name)
-
-    setCurrentLyricKey(currentLyric.key)
-  }, [client, currentLyrics.name])
+  const preferredLyricsName = useMemo(() => lyrics.some(lyric => lyric.name === lyricsName) ? lyricsName : "Farsi", [lyricsName, lyrics])
 
   useEffect(() => {
-    const lyricsInterval = setInterval(() => {
-      currentLyricHandler()
-    }, 5)
-
     const progressBarInterval = setInterval(() => {
-      const currentTime = client.getCurrentSongTime()
+      const currentTime = client.getTime()
       setNavigationProgress(currentTime * 100 / info.duration)
     }, 50)
 
     return () => {
-      clearInterval(lyricsInterval)
       clearInterval(progressBarInterval)
     }
-  }, [client, currentLyrics.delay, currentLyrics.lyrics, currentLyricHandler, info.duration])
+  }, [client, info.duration])
+
+  useEffect(() => {
+    client.lyricsName = preferredLyricsName
+  }, [preferredLyricsName, client])
 
   useEffect(() => {
     return () => {
@@ -62,13 +53,11 @@ const Home: React.FC<{ songs: SongFullDetails[] }> = (props) => {
           />}
 
         </Stack>
-        <Lyrics currentLyricKey={currentLyricKey} lyrics={currentLyrics.lyrics} />
+        <Lyrics client={client} />
       </Stack>
 
       <AudioToggleButton
-        currentSongName={name}
-        getTime={() => client.getCurrentSongTime()}
-        songs={props.songs}
+        audio={audio}
       />
     </Container >
   )

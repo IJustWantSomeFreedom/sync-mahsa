@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { IconVolume, IconVolumeOff } from '@tabler/icons';
 import { Button, createStyles, keyframes, Popover, Text } from '@mantine/core';
-import { useSongAudio, UseSongAudioOptions } from '../../hooks/songAudio';
+import { useSongAudio } from '../../hooks/songAudio';
 
 const bounce = keyframes({
   'from': { transform: 'translate(-50%, 0)' },
@@ -45,13 +45,16 @@ const useStyles = createStyles(theme => ({
   },
 }));
 
-const AudioToggleButton: React.FC<UseSongAudioOptions> = ({ currentSongName, getTime, songs }) => {
+type AudioToggleButtonProps = {
+  audio: ReturnType<typeof useSongAudio>
+}
+
+const AudioToggleButton: React.FC<AudioToggleButtonProps> = ({ audio }) => {
   const { classes } = useStyles()
   const [shouldPopoverOpen, setShouldPopoverOpen] = useState(true)
-  const { togglePlay, isPlaying } = useSongAudio({ currentSongName, getTime, songs })
 
   const clickHandler = () => {
-    togglePlay()
+    audio.togglePlay()
     setShouldPopoverOpen(false)
   }
 
@@ -69,7 +72,7 @@ const AudioToggleButton: React.FC<UseSongAudioOptions> = ({ currentSongName, get
       >
         <Popover.Target>
           <Button variant='subtle' onClick={clickHandler}>
-            {isPlaying ? <IconVolume /> : <IconVolumeOff />}
+            {audio.isPlaying ? <IconVolume /> : <IconVolumeOff />}
           </Button>
         </Popover.Target>
         <Popover.Dropdown>

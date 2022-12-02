@@ -1,127 +1,135 @@
-import { SongFullDetails } from "../SongParser/types";
+import { ParsedLyrics, SongFullDetails, SongLyric } from "../SongParser/types";
 import { Timer } from "../Time";
+import { EventEmitter } from "./../EventEmitter";
 
-type EventsMap = {
-    "next-song": () => void;
-}
+type ClientSongEvents = {
+  lyric: (lyric: SongLyric) => void;
+  "song-change": (song: SongFullDetails) => void;
+  "lyrics-name-change": (lyrics: ParsedLyrics) => void;
+};
 
-export class SongsClient {
-    private events: { [key in keyof EventsMap]?: EventsMap[key][] } = {}
-    private interval: NodeJS.Timer | null = null;
+export class ClientSong {
+  events = new EventEmitter<ClientSongEvents>();
+  private _lyricsName: string = this.getCurrentSong().lyrics[0].name;
 
-    constructor(private songs: SongFullDetails[]) { }
+  constructor(public songs: SongFullDetails[]) {}
 
-    listen() {
-        let prev = this.getCurrentSong()
+  getCurrentSong() {
+    let offset = Timer.now().valueOf() % this.getWholeTimeInMS();
 
-        this.interval = setInterval(() => {
-            const current = this.getCurrentSong()
+    for (let i = 0; i < this.songs.length; i++) {
+      const song = this.songs[i];
 
-            if (prev.name !== current.name) {
-                this.emit("next-song")
-            }
+      if (offset < song.info.duration) {
+        return song;
+      }
 
-            prev = current
-        }, 5)
+      offset -= song.info.duration;
     }
 
-    getWholeTimeInMS() {
-        return this.songs.reduce((a, b) => a + b.info.duration, 0)
+    return this.songs[0];
+  }
+
+  set lyricsName(name: string) {
+    const { lyrics } = this.getCurrentSong();
+
+    const prev = this._lyricsName;
+
+    this._lyricsName = (
+      lyrics.find((item) => item.name === name) || lyrics[0]
+    ).name;
+
+    if (this._lyricsName !== prev) {
+      this.events.emit("lyrics-name-change", this.getLyrics());
     }
+  }
 
-    cleanup() {
-        if (this.interval) clearInterval(this.interval)
-    }
+  get lyricsName() {
+    const { lyrics } = this.getCurrentSong();
 
-    getCurrentSong() {
-        let offset = Timer.now().valueOf() % this.getWholeTimeInMS()
+    return (lyrics.find((item) => item.name === this._lyricsName) || lyrics[0])
+      .name;
+  }
 
-        for (let i = 0; i < this.songs.length; i++) {
-            const song = this.songs[i]
+  getLyrics() {
+    const { lyrics } = this.getCurrentSong();
 
-            if (offset < song.info.duration) {
-                return song
-            }
+    return lyrics.find((item) => item.name === this.lyricsName)!;
+  }
 
-            offset -= song.info.duration
+  listen() {
+    let prevLyric: string | null = null;
+    let prevSong: string | null = this.getCurrentSong().name;
+
+    const interval = setInterval(() => {
+      const lyric = this.getLyric();
+
+      if (prevLyric !== lyric.key) {
+        this.events.emit("lyric", lyric);
+        prevLyric = lyric.key;
+      }
+
+      const song = this.getCurrentSong();
+      if (prevSong !== song.name) {
+        this.events.emit("song-change", song);
+        prevSong = song.name;
+      }
+    }, 50);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }
+
+  getLyric() {
+    const currentTime = this.getTime();
+    const currentLyrics = this.getLyrics();
+
+    const currentTimeInMS = currentTime - currentLyrics.delay;
+
+    for (let i = 0; i < currentLyrics.lyrics.length; i++) {
+      const current = currentLyrics.lyrics[i];
+      const prev = currentLyrics.lyrics[i - 1];
+
+      if (currentTimeInMS < current.startTime) {
+        if (prev) {
+          return prev;
         }
 
-        return this.songs[0]
+        return current;
+      } else if (currentTimeInMS === current.startTime) {
+        return current;
+      }
+
+      // last item
+      if (
+        i === currentLyrics.lyrics.length - 1 &&
+        currentTimeInMS >= current.startTime
+      ) {
+        return current;
+      }
     }
 
-    getCurrentSongTime() {
-        let offset = Timer.now().valueOf() % this.getWholeTimeInMS()
+    return currentLyrics.lyrics[0];
+  }
 
-        for (let i = 0; i < this.songs.length; i++) {
-            const song = this.songs[i]
+  getTime() {
+    let offset = Timer.now().valueOf() % this.getWholeTimeInMS();
 
-            if (offset < song.info.duration) {
-                break
-            }
+    for (let i = 0; i < this.songs.length; i++) {
+      const song = this.songs[i];
 
-            offset -= song.info.duration
-        }
+      if (offset < song.info.duration) {
+        break;
+      }
 
-        return offset
+      offset -= song.info.duration;
     }
 
-    getNextSong() {
-        const currentSong = this.getCurrentSong()
+    return offset;
+  }
 
-        const index = this.songs.indexOf(currentSong)
-
-        return this.songs[index >= this.songs.length ? 0 : index + 1]
-    }
-
-    getCurrentLyric(lyricsName: string) {
-        const { lyrics } = this.getCurrentSong()
-        const currentTime = this.getCurrentSongTime()
-        const currentLyrics = lyrics.find(lyrics => lyrics.name = lyricsName) || lyrics[0]
-
-        const currentTimeInMS = currentTime - currentLyrics.delay
-
-        for (let i = 0; i < currentLyrics.lyrics.length; i++) {
-
-            const current = currentLyrics.lyrics[i]
-            const prev = currentLyrics.lyrics[i - 1]
-
-            if (currentTimeInMS < current.startTime) {
-                if (prev) {
-                    return prev
-                }
-
-                return current
-            } else if (currentTimeInMS === current.startTime) {
-                return current
-            }
-
-            // last item
-            if (i === currentLyrics.lyrics.length - 1 && currentTimeInMS >= current.startTime) {
-                return current
-            }
-        }
-
-        return currentLyrics.lyrics[0]
-    }
-
-    on<TEvent extends keyof EventsMap>(event: TEvent, callback: EventsMap[TEvent]) {
-        this.events[event] ||= []
-        this.events[event]?.push(callback)
-
-        return () => this.off(event, callback)
-    }
-
-    off<TEvent extends keyof EventsMap>(event: TEvent, callback: EventsMap[TEvent]) {
-        const index = this.events[event]?.indexOf(callback)
-
-        if (typeof index === "number" && index > -1) {
-            this.events[event]?.splice(index, 1)
-        }
-    }
-
-    private emit<TEvent extends keyof EventsMap>(event: TEvent, ...args: Parameters<EventsMap[TEvent]>) {
-        this.events[event]?.forEach(cb => {
-            (cb as any)(...args)
-        })
-    }
+  private getWholeTimeInMS() {
+    return this.songs.reduce((a, b) => a + b.info.duration, 0);
+  }
 }

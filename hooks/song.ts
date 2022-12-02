@@ -1,23 +1,25 @@
-import { useState, useEffect } from "react"
-import { SongsClient } from "../lib/ClientSong"
-import { SongFullDetails } from "../lib/SongParser/types"
+import { useState, useEffect } from "react";
+import { ClientSong } from "../lib/ClientSong";
+import { SongFullDetails } from "../lib/SongParser/types";
+import { useSongAudio } from "./songAudio";
 
 export const useSong = (songDetails: SongFullDetails[]) => {
-    const [client] = useState(() => new SongsClient(songDetails))
-    const [currentSong, setCurrentSong] = useState<SongFullDetails>(client.getCurrentSong())
+  const [client, setClient] = useState(() => new ClientSong(songDetails));
+  const audio = useSongAudio({ client });
 
-    useEffect(() => {
-        client.listen()
-        const off = client.on("next-song", () => {
-            const current = client.getCurrentSong()
-            setCurrentSong(current)
-        })
+  useEffect(() => {
+    const cleanup = client.listen();
+    const off = client.events.on("song-change", () => {
+      setClient(new ClientSong(songDetails));
+    });
 
-        return () => {
-            off()
-            client.cleanup()
-        }
-    }, [client])
+    return () => {
+      off();
+      cleanup();
+    };
+  }, [client, songDetails]);
 
-    return { client, currentSong }
-}
+  const currentSong = client.getCurrentSong();
+
+  return { client, currentSong, audio };
+};

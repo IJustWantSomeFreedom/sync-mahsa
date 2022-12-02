@@ -1,7 +1,8 @@
 import { createStyles, ScrollArea, Space, Text } from '@mantine/core'
 import { useViewportSize } from '@mantine/hooks';
-import React, { useEffect, useMemo, useRef } from 'react'
-import { SongLyric } from '../../lib/SongParser/types';
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { ClientSong } from '../../lib/ClientSong';
+import { ParsedLyrics, SongLyric } from '../../lib/SongParser/types';
 
 type StylesOptions = {
     viewportHeight: number;
@@ -16,19 +17,36 @@ const useStyles = createStyles((theme, { viewportHeight }: StylesOptions) => ({
 }))
 
 type LyricsProps = {
-    currentLyricKey: string | undefined;
-    lyrics: SongLyric[]
+    client: ClientSong
 }
 
-const Lyrics: React.FC<LyricsProps> = ({ currentLyricKey, lyrics }) => {
+const Lyrics: React.FC<LyricsProps> = ({ client }) => {
     const { height } = useViewportSize()
     const { classes, theme } = useStyles({ viewportHeight: height })
     const currentLyricRef = useRef<HTMLDivElement>(null)
     const viewport = useRef<HTMLDivElement>();
 
+    const [lyric, setLyric] = useState<SongLyric>()
+    const [lyrics, setLyrics] = useState<ParsedLyrics>(client.getLyrics())
+
     useEffect(() => {
         viewport.current?.scrollTo({ top: (currentLyricRef.current?.offsetTop || 0) - (viewport.current.clientHeight / 2), behavior: "smooth" })
-    }, [currentLyricKey])
+    }, [lyric])
+
+    useEffect(() => {
+        const offLyric = client.events.on("lyric", (lyric) => {
+            setLyric(lyric)
+        })
+
+        const offLyricsNameChange = client.events.on("lyrics-name-change", (lyrics) => {
+            setLyrics(lyrics)
+        })
+
+        return () => {
+            offLyric()
+            offLyricsNameChange()
+        }
+    }, [client])
 
     return (
         <ScrollArea
@@ -40,8 +58,8 @@ const Lyrics: React.FC<LyricsProps> = ({ currentLyricKey, lyrics }) => {
             <Space h={(viewport.current?.clientHeight || 0) * .4} />
 
             {
-                useMemo(() => lyrics.map(({ key, lyric, pronunciation }) => {
-                    const isCurrent = currentLyricKey === key
+                useMemo(() => lyrics?.lyrics.map(({ key, lyric: lyricText, pronunciation }) => {
+                    const isCurrent = lyric?.key === key
 
                     return (
                         <div key={key}>
@@ -53,7 +71,7 @@ const Lyrics: React.FC<LyricsProps> = ({ currentLyricKey, lyrics }) => {
                                 size={isCurrent ? "lg" : "md"}
                                 dir="auto"
                             >
-                                {lyric}
+                                {lyricText}
                             </Text>}
                             {<Text
                                 weight={isCurrent ? "bold" : "normal"}
@@ -68,7 +86,7 @@ const Lyrics: React.FC<LyricsProps> = ({ currentLyricKey, lyrics }) => {
                             <Space h="xs" />
                         </div>
                     )
-                }), [lyrics, currentLyricKey, theme.colorScheme])
+                }), [theme.colorScheme, lyric?.key, lyrics?.lyrics])
             }
 
             <Space h={(viewport.current?.clientHeight || 0) * .4} />

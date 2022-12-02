@@ -1167,10 +1167,10 @@
     "@radix-ui/react-scroll-area" "1.0.0"
     react-textarea-autosize "8.3.4"
 
-"@mantine/hooks@^5.5.4":
-  version "5.5.4"
-  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.5.4.tgz#5b7f14dfffba4f59aed21ee6bccf336a438f96a3"
-  integrity sha512-4lPIcZgoMkq+GCILN8CDTVxYzsE/Gfi6ICjHhPZU1Ufmw0mftpjTQhLx3+TFMtBlqnamgBia2ZS1o2BpvTLazA==
+"@mantine/hooks@^5.9.0":
+  version "5.9.0"
+  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-5.9.0.tgz#c3ad41ab73a06b5b9a71d7c57571f8e0b1bc96cb"
+  integrity sha512-SkxMMYMe/X7UBcWrgjPy5kWMRZrphEueeopYvrivGLKf0xsL1o5O7DH2yq9r5IlTXb8B3vwwoEctxH5FA8Yb2Q==
 
 "@mantine/next@^5.5.5":
   version "5.5.5"
@@ -1188,12 +1188,12 @@
     "@mantine/utils" "5.5.5"
     react-transition-group "4.4.2"
 
-"@mantine/nprogress@^5.5.4":
-  version "5.5.4"
-  resolved "https://registry.yarnpkg.com/@mantine/nprogress/-/nprogress-5.5.4.tgz#273356b0090e80b463ad7f4199981b74702e9d6a"
-  integrity sha512-6Bx7+D9xwFDWW/THCBJGlDVgAv3jWCW55SXxeRi7dXkN5BmU5Fqe0NY3JS902iTsTyrXE9HgI2jXtVMJHZOrkA==
+"@mantine/nprogress@^5.9.0":
+  version "5.9.0"
+  resolved "https://registry.yarnpkg.com/@mantine/nprogress/-/nprogress-5.9.0.tgz#9845d8bfc0f084505d80c877424982837d5fe798"
+  integrity sha512-DY9lfW21LRLsUosf4teYXmDdTmJq5BaKjBqT5gc0PmUI4AsfgGkjz8l8A5bhOJcUE0fxyLWogjAmMaW1MlzkmA==
   dependencies:
-    "@mantine/utils" "5.5.4"
+    "@mantine/utils" "5.9.0"
 
 "@mantine/ssr@5.5.5":
   version "5.5.5"
@@ -1228,6 +1228,11 @@
   version "5.5.5"
   resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.5.5.tgz#22b412b6e9d78f2515f9f98db3f5ed83deca91ca"
   integrity sha512-nt8+A0N1cV4cJNqlKuXazShoEwqtLohHNKFuywEdF3B6vHWdbY799PbT2WmqGTwNQ+se8y5/nBMmamBZrUN4fg==
+
+"@mantine/utils@5.9.0":
+  version "5.9.0"
+  resolved "https://registry.yarnpkg.com/@mantine/utils/-/utils-5.9.0.tgz#f21ba4c518a6561bea079c7c909298f35f492a99"
+  integrity sha512-UU5kO1VcsntrKvznJMjZ1S/ZM6arAXFkBnBqAKfCPOPJJIcwUWOfQP8u1sxp8ounAHThp9GtkpuzzGOQy1rcPA==
 
 "@next/bundle-analyzer@^13.0.0":
   version "13.0.0"
